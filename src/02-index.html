@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Like Counter</title>
+    <!-- Modern typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            background-color: #0f172a; /* Deep premium background */
+            font-family: 'Outfit', sans-serif;
+            gap: 32px;
+        }
+
+        /* Displays the Likes Count */
+        .counter-display {
+            color: #f8fafc;
+            font-size: 3rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            text-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .counter-display.pop {
+            transform: scale(1.1);
+        }
+
+        /* Beautifully styled Like button */
+        .like-button {
+            color: white;
+            font-size: 1.125rem;
+            font-weight: 600;
+            letter-spacing: 0.025em;
+            background: linear-gradient(135deg, #ec4899 0%, #e11d48 100%); /* Premium rose/pink gradient for "Like" */
+            border: none;
+            border-radius: 9999px; /* Fully rounded pill shape */
+            padding: 18px 48px;
+            cursor: pointer;
+            box-shadow: 0 8px 24px -4px rgba(225, 29, 72, 0.6);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Hover shimmer effect */
+        .like-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                120deg,
+                transparent,
+                rgba(255, 255, 255, 0.3),
+                transparent
+            );
+            transition: left 0.6s ease;
+        }
+
+        .like-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px -4px rgba(225, 29, 72, 0.8);
+        }
+
+        .like-button:hover::before {
+            left: 100%;
+        }
+
+        .like-button:active {
+            transform: translateY(2px) scale(0.98);
+            box-shadow: 0 4px 12px -2px rgba(225, 29, 72, 0.5);
+        }
+        
+        /* SVG Icon for like button */
+        .heart-icon {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+            transition: transform 0.3s ease;
+        }
+
+        .like-button:hover .heart-icon {
+            transform: scale(1.15);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="counter-display" class="counter-display">Likes: 0</div>
+
+    <button id="like-button" class="like-button">
+        <svg class="heart-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+        </svg>
+        Like
+    </button>
+    
+    <script>
+        const likeButton = document.getElementById('like-button');
+        const counterDisplay = document.getElementById('counter-display');
+        let count = 0;
+
+        likeButton.addEventListener('click', () => {
+            count++;
+            counterDisplay.textContent = `Likes: ${count}`;
+            
+            // Re-trigger the pop animation by removing and re-adding the class
+            counterDisplay.classList.remove('pop');
+            // Force browser reflow to reset animation
+            void counterDisplay.offsetWidth;
+            counterDisplay.classList.add('pop');
+            
+            // Optional: subtle vibration effect on the button click using Web API if supported
+            if (navigator.vibrate) {
+                navigator.vibrate(50); // Short vibration
+            }
+        });
+    </script>
+</body>
+</html>

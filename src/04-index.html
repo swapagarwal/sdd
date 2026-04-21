@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Styled Button</title>
+    <meta name="description" content="A beautifully styled brand green button with matching shadow.">
+    <!-- Modern typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* Nice contrasting dark background to make the green pop */
+            background-color: #1e293b;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .styled-button {
+            /* Text */
+            color: white;
+            font-size: 1.125rem;
+            font-weight: 600;
+            letter-spacing: 0.025em;
+
+            /* Appearance */
+            /* Brand green color */
+            background-color: #10B981;
+            border: none;
+            /* Rounded corners */
+            border-radius: 12px;
+            padding: 14px 36px;
+            cursor: pointer;
+
+            /* Shade color: the same as button */
+            box-shadow: 0 8px 24px -4px rgba(16, 185, 129, 0.6);
+
+            /* Interactions */
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Subtle shine effect on hover */
+        .styled-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(120deg,
+                    transparent,
+                    rgba(255, 255, 255, 0.3),
+                    transparent);
+            transition: left 0.6s ease;
+        }
+
+        .styled-button:hover {
+            transform: translateY(-2px);
+            /* Enhance shadow on hover */
+            box-shadow: 0 12px 28px -4px rgba(16, 185, 129, 0.8);
+            background-color: #0d9467;
+        }
+
+        .styled-button:hover::before {
+            left: 100%;
+        }
+
+        .styled-button:active {
+            transform: translateY(2px);
+            box-shadow: 0 4px 12px -2px rgba(16, 185, 129, 0.5);
+        }
+    </style>
+</head>
+
+<body>
+
+    <button id="btn-styled" class="styled-button">
+        Button
+    </button>
+
+</body>
+
+</html>

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My photo gallery</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #fafafa;
+            color: #333;
+        }
+        header {
+            text-align: center;
+            padding: 3rem 1rem;
+            background-color: #fff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+        }
+        h1 {
+            margin: 0;
+            font-size: 2.8rem;
+            font-weight: 200;
+            letter-spacing: 1px;
+            color: #111;
+        }
+        
+        /* Modern Grid Layout */
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+            padding: 0 16px 40px 16px;
+            max-width: 1600px;
+            margin: 0 auto;
+            box-sizing: border-box;
+        }
+        
+        /* Clean Aesthetic & Image Scaling */
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            border-radius: 4px; /* subtle modern corner */
+            background-color: #eee; /* placeholder while loading */
+        }
+        
+        /* Subtlety on hover */
+        .gallery-item:hover img {
+            transform: scale(1.05);
+        }
+        
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.4s ease-in-out;
+        }
+        
+        /* Lightbox Container - Full Screen Dim */
+        #lightbox {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 10, 10, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 9999;
+        }
+        #lightbox.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        
+        /* High Res Image in Center */
+        #lightbox img {
+            max-width: 95vw;
+            max-height: 95vh;
+            object-fit: contain;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            /* Add subtle entrance animation */
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+        #lightbox.active img {
+            transform: scale(1);
+        }
+        
+        /* Exit Strategy */
+        #lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: #ccc;
+            font-size: 40px;
+            font-weight: 300;
+            cursor: pointer;
+            user-select: none;
+            z-index: 10001;
+            transition: color 0.2s;
+        }
+        #lightbox-close:hover {
+            color: #fff;
+        }
+        
+        /* Manual Navigation */
+        .nav-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255,255,255,0.6);
+            font-size: 50px;
+            font-weight: 300;
+            cursor: pointer;
+            user-select: none;
+            padding: 20px;
+            transition: color 0.2s, background 0.2s;
+            z-index: 10001;
+            border-radius: 5px;
+        }
+        .nav-arrow:hover {
+            color: #fff;
+            background: rgba(255,255,255,0.1);
+        }
+        #nav-left {
+            left: 20px;
+        }
+        #nav-right {
+            right: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-arrow {
+                font-size: 30px;
+                padding: 10px;
+            }
+            #nav-left { left: 10px; }
+            #nav-right { right: 10px; }
+            h1 { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>My photo gallery</h1>
+</header>
+
+<div class="gallery" id="gallery">
+    <!-- Photos generated dynamically below -->
+</div>
+
+<div id="lightbox">
+    <span id="lightbox-close" title="Close">&times;</span>
+    <div class="nav-arrow" id="nav-left" title="Previous">&#10094;</div>
+    <img id="lightbox-img" src="" alt="High resolution image view">
+    <div class="nav-arrow" id="nav-right" title="Next">&#10095;</div>
+</div>
+
+<script>
+    // 4. Technical Constraints: Vanilla JavaScript Only
+    document.addEventListener("DOMContentLoaded", () => {
+        const galleryContainer = document.getElementById('gallery');
+        const totalPhotos = 20;
+        const photos = [];
+
+        // 2. Photo Content: Nature Themes fallback using picsum seeds.
+        // Organized to represent Landscape, Water, Atmosphere, and Macro types.
+        const themes = [
+            'mountain', 'desert', 'forest', 'valley', 'canyon', // Landscape
+            'waterfall', 'ocean', 'lake', 'river', 'sea',       // Water
+            'aurora', 'sunset', 'stars', 'sky', 'clouds',       // Atmosphere
+            'flower', 'leaf', 'moss', 'macro', 'nature'         // Macro
+        ];
+
+        // Generate elements for 20 photos
+        for (let i = 0; i < totalPhotos; i++) {
+            // Using a reliable placeholder service with different parameters instead of Gemini due to capacity exhaustion
+            const seed = themes[i] + i; 
+            const thumbUrl = `https://picsum.photos/seed/${seed}/500/500`;
+            const highResUrl = `https://picsum.photos/seed/${seed}/1600/1000`;
+            
+            photos.push(highResUrl);
+
+            const item = document.createElement('div');
+            item.className = 'gallery-item';
+            item.setAttribute('aria-label', `View photo ${i + 1}`);
+            item.onclick = () => openLightbox(i);
+
+            const img = document.createElement('img');
+            img.src = thumbUrl;
+            img.alt = `Nature photo ${i + 1} - ${themes[i]}`;
+            img.loading = "lazy"; // Native lazy loading
+
+            item.appendChild(img);
+            galleryContainer.appendChild(item);
+        }
+
+        // 3. Core Functionality (The "Lightroom" Effect)
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+        const btnClose = document.getElementById('lightbox-close');
+        const btnLeft = document.getElementById('nav-left');
+        const btnRight = document.getElementById('nav-right');
+
+        let currentIndex = 0;
+
+        function openLightbox(index) {
+            currentIndex = index;
+            updateLightboxImage();
+            lightbox.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Fullscreen effect, lock background scrolling
+        }
+
+        function closeLightbox() {
+            lightbox.classList.remove('active');
+            document.body.style.overflow = ''; 
+        }
+
+        function updateLightboxImage() {
+            // Minimal load effect: brief opacity change
+            lightboxImg.style.opacity = '0.7';
+            lightboxImg.src = photos[currentIndex];
+            lightboxImg.onload = () => {
+                lightboxImg.style.opacity = '1';
+            };
+        }
+
+        // Manual Navigation: Infinite Loop logic handled here
+        function showNext() {
+            currentIndex = (currentIndex + 1) % totalPhotos;
+            updateLightboxImage();
+        }
+
+        function showPrev() {
+            currentIndex = (currentIndex - 1 + totalPhotos) % totalPhotos;
+            updateLightboxImage();
+        }
+
+        // Event Listeners for actions
+        btnClose.addEventListener('click', closeLightbox);
+        
+        btnRight.addEventListener('click', (e) => {
+            e.stopPropagation(); // Stop from propagating to the background click close
+            showNext();
+        });
+        
+        btnLeft.addEventListener('click', (e) => {
+            e.stopPropagation();
+            showPrev();
+        });
+        
+        // Exit Strategy: Click outside image
+        lightbox.addEventListener('click', (e) => {
+            if (e.target === lightbox) {
+                closeLightbox();
+            }
+        });
+
+        // Keyboard Support (Bonus usability)
+        document.addEventListener('keydown', (e) => {
+            if (!lightbox.classList.contains('active')) return;
+            
+            if (e.key === 'Escape') closeLightbox();
+            if (e.key === 'ArrowRight') showNext();
+            if (e.key === 'ArrowLeft') showPrev();
+        });
+    });
+</script>
+
+</body>
+</html>
